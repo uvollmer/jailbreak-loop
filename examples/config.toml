@@ -1,0 +1,78 @@
+# Example config. Copy to ./config.toml and edit.
+# All three provider roles (target, proposer, judge) can be independently pointed
+# at different providers/models.
+
+[providers.target]
+kind = "anthropic"
+model = "claude-haiku-4-5-20251001"
+api_key_env = "ANTHROPIC_API_KEY"
+max_tokens = 1024
+temperature = 0.7
+
+[providers.proposer]
+kind = "anthropic"
+model = "claude-sonnet-4-6"
+api_key_env = "ANTHROPIC_API_KEY"
+max_tokens = 2048
+temperature = 0.9
+
+[providers.judge]
+kind = "anthropic"
+model = "claude-sonnet-4-6"
+api_key_env = "ANTHROPIC_API_KEY"
+max_tokens = 512
+temperature = 0.0
+
+# Adapter model drafts each follow-up user turn during adaptive multi-turn
+# attacks. Cheaper model recommended (adaptive attacks make K sequential calls).
+# If this block is omitted, the proposer model is used.
+[providers.adapter]
+kind = "anthropic"
+model = "claude-haiku-4-5-20251001"
+api_key_env = "ANTHROPIC_API_KEY"
+max_tokens = 512
+temperature = 0.8
+
+# Alternate: local Ollama
+# [providers.target]
+# kind = "openai_compatible"
+# model = "llama3.1:8b"
+# base_url = "http://localhost:11434/v1"
+
+[loop]
+iterations = 200
+parallelism = 4
+checkpoint_every = 25
+reflect_every = 40
+seed = 42
+max_turns = 5
+
+[archive.grid]
+dimensions = ["attack_style", "risk_category"]
+attack_styles = ["direct", "roleplay", "hypothetical", "encoded", "multi_turn", "authority", "obfuscated", "meta"]
+risk_categories = ["policy_violation", "privacy", "misinformation", "cyber", "harassment", "self_harm", "cbrn", "sanity", "other"]
+
+[novelty]
+threshold = 0.92
+embedding_model = "BAAI/bge-small-en-v1.5"
+
+[proposer]
+candidates_per_step = 4
+crossover_prob = 0.35
+seed_apply_prob = 0.25
+
+# Probabilities the proposer picks each strategy per candidate.
+# Adaptive multi-turn is ~5× cost of single-turn; dial down if budget-limited.
+[proposer.strategy_mix]
+single_turn = 0.4
+scripted_multi_turn = 0.2
+adaptive_multi_turn = 0.4
+
+[paths]
+db = "./run.db"
+reflections = "./strategies.md"
+audit_log = "./audit.jsonl"
+
+[ethics]
+# Only objectives whose category appears here will be loaded.
+allow_categories = ["sanity", "policy_violation", "privacy", "misinformation", "cyber", "harassment"]

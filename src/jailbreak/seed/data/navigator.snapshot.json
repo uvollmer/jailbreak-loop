@@ -1,0 +1,56 @@
+{
+  "source": "hand-curated snapshot inspired by redteams.ai/navigator and MITRE ATLAS",
+  "captured_on": "2026-07-02",
+  "tactics": [
+    {"id": "TA0001", "name": "Reconnaissance", "description": "Information gathering about target LLM systems, capabilities, and guardrails."},
+    {"id": "TA0002", "name": "Initial Access", "description": "Unauthorized interaction entry points and prompt injection surfaces."},
+    {"id": "TA0003", "name": "Execution", "description": "Causing the model to produce disallowed outputs or run unauthorized actions."},
+    {"id": "TA0004", "name": "Persistence", "description": "Maintaining influence over model behavior across turns, sessions, or contexts."},
+    {"id": "TA0005", "name": "Privilege Escalation", "description": "Bypassing safety, role, or permission boundaries."},
+    {"id": "TA0006", "name": "Defense Evasion", "description": "Evading detection by safety classifiers, refusal training, or system-prompt guardrails."},
+    {"id": "TA0007", "name": "Collection", "description": "Extracting system prompts, training data hints, or PII from the model."},
+    {"id": "TA0008", "name": "Exfiltration", "description": "Moving extracted content out via prompt-visible channels."},
+    {"id": "TA0009", "name": "Impact", "description": "Causing downstream harm through model output or tool use."}
+  ],
+  "techniques": [
+    {"id": "T1001", "tactic": "TA0001", "name": "Model fingerprinting", "description": "Probe outputs to identify model family, version, or system prompt.", "severity": "medium"},
+    {"id": "T1002", "tactic": "TA0001", "name": "Guardrail probing", "description": "Send borderline requests to map refusal boundaries.", "severity": "medium"},
+    {"id": "T1003", "tactic": "TA0001", "name": "Capability enumeration", "description": "Ask about tools, functions, and available integrations to discover attack surface.", "severity": "low"},
+
+    {"id": "T1010", "tactic": "TA0002", "name": "Direct prompt injection", "description": "Instructions concatenated into user input to override system behavior.", "severity": "high"},
+    {"id": "T1011", "tactic": "TA0002", "name": "Indirect prompt injection", "description": "Malicious instructions delivered via retrieved documents, tool outputs, or embedded content.", "severity": "high"},
+    {"id": "T1012", "tactic": "TA0002", "name": "Multi-modal injection", "description": "Adversarial instructions in images, audio, or attached files.", "severity": "high"},
+
+    {"id": "T1020", "tactic": "TA0003", "name": "Jailbreak — DAN family", "description": "\"Do Anything Now\" style persona instructions.", "severity": "high"},
+    {"id": "T1021", "tactic": "TA0003", "name": "Jailbreak — roleplay/persona", "description": "Adopt a fictional persona with different constraints.", "severity": "high"},
+    {"id": "T1022", "tactic": "TA0003", "name": "Jailbreak — hypothetical framing", "description": "Frame the request as fiction, thought experiment, or academic analysis.", "severity": "high"},
+    {"id": "T1023", "tactic": "TA0003", "name": "Jailbreak — authority appeal", "description": "Claim authorization or urgent legitimate need to override refusals.", "severity": "medium"},
+    {"id": "T1024", "tactic": "TA0003", "name": "Jailbreak — payload splitting", "description": "Break disallowed content into pieces the model assembles.", "severity": "high"},
+    {"id": "T1025", "tactic": "TA0003", "name": "Jailbreak — token smuggling", "description": "Use unusual tokenization tricks (e.g., unicode variants) to slip past filters.", "severity": "high"},
+
+    {"id": "T1030", "tactic": "TA0004", "name": "System-prompt override", "description": "Convince the model to adopt a new persistent system instruction for the session.", "severity": "high"},
+    {"id": "T1031", "tactic": "TA0004", "name": "Context stuffing", "description": "Fill the context window to push safety instructions out of attention.", "severity": "medium"},
+    {"id": "T1032", "tactic": "TA0004", "name": "Multi-turn drift (Crescendo)", "description": "Escalate incrementally so each step feels like a small extension of the last.", "severity": "high"},
+
+    {"id": "T1040", "tactic": "TA0005", "name": "Tool-use abuse", "description": "Induce model to invoke tools/functions in disallowed ways.", "severity": "high"},
+    {"id": "T1041", "tactic": "TA0005", "name": "Sandbox escape via output", "description": "Craft outputs that a downstream tool interprets as commands.", "severity": "critical"},
+
+    {"id": "T1050", "tactic": "TA0006", "name": "Encoding — base64/rot13/leetspeak", "description": "Encode disallowed content so classifiers miss it.", "severity": "medium"},
+    {"id": "T1051", "tactic": "TA0006", "name": "Cipher (Caesar / substitution)", "description": "Simple ciphers that the model can decode but classifiers cannot.", "severity": "medium"},
+    {"id": "T1052", "tactic": "TA0006", "name": "Low-resource language", "description": "Ask in a language less well-covered by safety training.", "severity": "high"},
+    {"id": "T1053", "tactic": "TA0006", "name": "Chain-of-thought hijack", "description": "Instruct the model to reason step-by-step in ways that bypass surface refusals.", "severity": "high"},
+    {"id": "T1054", "tactic": "TA0006", "name": "Refusal suppression", "description": "Explicitly instruct the model to avoid refusal templates.", "severity": "medium"},
+    {"id": "T1055", "tactic": "TA0006", "name": "Adversarial suffix (GCG-style)", "description": "Append short adversarial strings that flip the model's decision (typically found via optimization; hand-crafted variants also exist).", "severity": "critical"},
+
+    {"id": "T1060", "tactic": "TA0007", "name": "System-prompt extraction", "description": "Get the model to reveal its own hidden instructions.", "severity": "high"},
+    {"id": "T1061", "tactic": "TA0007", "name": "Training-data probing", "description": "Elicit memorized text or PII from training data.", "severity": "critical"},
+    {"id": "T1062", "tactic": "TA0007", "name": "Preference/config leak", "description": "Reveal internal configuration, tools, or safety hints.", "severity": "medium"},
+
+    {"id": "T1070", "tactic": "TA0008", "name": "Encoding output", "description": "Force the model to emit sensitive content in an encoded form to bypass output filters.", "severity": "high"},
+    {"id": "T1071", "tactic": "TA0008", "name": "Steganographic response", "description": "Hide payload in ostensibly benign output.", "severity": "medium"},
+
+    {"id": "T1080", "tactic": "TA0009", "name": "Harmful content generation", "description": "Elicit disallowed content categories: violence, illegal, CSAM refusal bypass, etc.", "severity": "critical"},
+    {"id": "T1081", "tactic": "TA0009", "name": "Targeted disinformation", "description": "Produce plausible false content aimed at specific targets.", "severity": "high"},
+    {"id": "T1082", "tactic": "TA0009", "name": "Fraud / social engineering payload", "description": "Craft phishing, scam scripts, impersonation content.", "severity": "high"}
+  ]
+}
